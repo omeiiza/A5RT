@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>OMEIZA.ETH — A5RT Performance</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root {
+  --black:#070707;
+  --bg:#0d0d0d;
+  --bg2:#111111;
+  --bg3:#161616;
+  --bg4:#1c1c1c;
+  --line:#222222;
+  --line2:#2a2a2a;
+  --white:#f0f0f0;
+  --grey:#888888;
+  --grey2:#555555;
+  --grey3:#333333;
+  --green:#4ade80;
+  --red:#f87171;
+  --yellow:#facc15;
+  --cyan:#67e8f9;
+  --grotesk:'Space Grotesk',sans-serif;
+  --inter:'Inter',sans-serif;
+  --mono:'Space Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--white);font-family:var(--inter);font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(7,7,7,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);height:52px;display:flex;align-items:center;padding:0 32px;gap:0}
+.nav-logo{font-family:var(--grotesk);font-size:13px;font-weight:700;letter-spacing:.05em;color:var(--white);margin-right:40px;display:flex;align-items:center;gap:8px}
+.nav-logo::before{content:'△';font-size:11px;color:var(--grey)}
+.nav-links{display:flex;gap:0;flex:1}
+.nav-link{font-size:12px;font-weight:400;color:var(--grey);padding:0 14px;height:52px;display:flex;align-items:center;cursor:pointer;transition:color .15s;border:none;background:none;letter-spacing:.02em;border-bottom:2px solid transparent}
+.nav-link:hover{color:var(--white)}
+.nav-link.active{color:var(--white);border-bottom-color:var(--white)}
+.nav-right{display:flex;align-items:center;gap:12px;margin-left:auto}
+.nav-tag{font-size:10px;font-family:var(--mono);color:var(--grey2);letter-spacing:.05em;padding:3px 8px;border:1px solid var(--line2)}
+
+/* ── PAGES ── */
+.page{display:none;padding:80px 32px 48px;max-width:1200px;margin:0 auto}
+.page.active{display:block}
+
+/* ── HERO STRIP ── */
+.hero-strip{border-bottom:1px solid var(--line);padding-bottom:32px;margin-bottom:40px}
+.hero-eyebrow{font-size:10px;font-family:var(--mono);color:var(--grey);letter-spacing:.12em;margin-bottom:16px}
+.hero-title{font-family:var(--grotesk);font-size:clamp(36px,5vw,64px);font-weight:700;line-height:1.05;letter-spacing:-.03em;margin-bottom:12px}
+.hero-title em{color:var(--grey);font-style:normal}
+.hero-sub{font-size:13px;color:var(--grey);max-width:480px;line-height:1.7}
+.hero-philosophy{display:flex;align-items:center;gap:16px;margin-top:24px;padding-top:24px;border-top:1px solid var(--line)}
+.phil-arrow{font-family:var(--grotesk);font-size:13px;font-weight:600;letter-spacing:.06em}
+.phil-div{color:var(--grey2);margin:0 4px}
+
+/* ── SECTION HEADERS ── */
+.sh{display:flex;align-items:baseline;gap:16px;margin-bottom:24px;padding-bottom:12px;border-bottom:1px solid var(--line)}
+.sh-title{font-family:var(--grotesk);font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--white)}
+.sh-meta{font-size:11px;color:var(--grey2);font-family:var(--mono)}
+.sh-right{margin-left:auto;font-size:10px;color:var(--grey2);font-family:var(--mono)}
+
+/* ── STAT GRID ── */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);margin-bottom:32px}
+.stat-cell{padding:20px 20px 18px;border-right:1px solid var(--line)}
+.stat-cell:last-child{border-right:none}
+.stat-val{font-family:var(--grotesk);font-size:28px;font-weight:700;letter-spacing:-.02em;line-height:1;margin-bottom:6px}
+.stat-label{font-size:10px;color:var(--grey);letter-spacing:.06em;text-transform:uppercase;font-family:var(--mono)}
+.stat-sub{font-size:11px;color:var(--grey2);margin-top:4px}
+.pos{color:var(--green)} .neg{color:var(--red)} .neu{color:var(--yellow)} .cyn{color:var(--cyan)} .wht{color:var(--white)}
+
+/* ── 2-COL ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);margin-bottom:1px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);margin-bottom:1px}
+.gcell{background:var(--bg);padding:24px}
+.gcell-title{font-size:10px;font-family:var(--mono);color:var(--grey);letter-spacing:.08em;margin-bottom:16px}
+
+/* ── TABLE ── */
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{text-align:left;padding:8px 0;font-size:10px;font-family:var(--mono);color:var(--grey2);letter-spacing:.06em;border-bottom:1px solid var(--line);font-weight:400}
+.tbl td{padding:10px 0;border-bottom:1px solid var(--line);vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--bg3);padding-left:6px;padding-right:6px;transition:padding .1s}
+.tbl th:not(:first-child),.tbl td:not(:first-child){text-align:right}
+
+/* ── TAGS ── */
+.tag{display:inline-block;padding:2px 6px;font-size:9px;font-family:var(--mono);letter-spacing:.05em;border:1px solid currentColor}
+.tg{color:var(--green)} .tr{color:var(--red)} .ty{color:var(--yellow)} .tc{color:var(--cyan)} .tmid{color:var(--grey2)}
+
+/* ── FULL-WIDTH CHART WRAP ── */
+.chart-wrap{background:var(--bg);border:1px solid var(--line);margin-bottom:1px}
+.chart-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 0;border-bottom:1px solid var(--line);padding-bottom:12px}
+.chart-title{font-size:10px;font-family:var(--mono);color:var(--grey);letter-spacing:.08em}
+.chart-body{padding:20px}
+
+/* ── INSIGHT BLOCK ── */
+.insight{border-left:2px solid var(--white);padding:14px 18px;margin-bottom:24px;background:var(--bg2)}
+.insight-label{font-size:9px;font-family:var(--mono);color:var(--grey);letter-spacing:.1em;margin-bottom:6px}
+.insight-text{font-size:13px;line-height:1.7;color:var(--grey)}
+.insight-text strong{color:var(--white);font-weight:500}
+
+/* ── WARN BLOCK ── */
+.warn{border-left:2px solid var(--red);padding:14px 18px;margin-bottom:24px;background:rgba(248,113,113,.04)}
+.warn-label{font-size:9px;font-family:var(--mono);color:var(--red);letter-spacing:.1em;margin-bottom:6px}
+.warn-text{font-size:12px;line-height:1.7;color:#fca5a5}
+.ok{border-left:2px solid var(--green);padding:14px 18px;margin-bottom:24px;background:rgba(74,222,128,.04)}
+.ok-text{font-size:12px;line-height:1.7;color:#86efac}
+
+/* ── PERFORMANCE BARS ── */
+.pbar-row{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.pbar-label{font-size:11px;color:var(--grey);width:140px;flex-shrink:0;font-family:var(--mono)}
+.pbar-bg{flex:1;height:3px;background:var(--line2)}
+.pbar-fill{height:100%;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.pbar-val{font-size:11px;font-family:var(--mono);width:52px;text-align:right}
+
+/* ── CIRCLE ROW ── */
+.circle-row{display:grid;grid-template-columns:repeat(6,1fr);gap:1px;background:var(--line);margin-bottom:24px}
+.cchip{background:var(--bg);padding:14px 12px;cursor:pointer;transition:background .1s;border-bottom:2px solid transparent}
+.cchip:hover,.cchip.active{background:var(--bg3);border-bottom-color:var(--white)}
+.cchip-id{font-size:9px;font-family:var(--mono);color:var(--grey);letter-spacing:.08em;margin-bottom:6px}
+.cchip-r{font-family:var(--grotesk);font-size:20px;font-weight:700;line-height:1}
+.cchip-meta{font-size:10px;color:var(--grey2);margin-top:4px}
+
+/* ── RULE CARDS ── */
+.rule-list{display:flex;flex-direction:column;gap:1px;background:var(--line)}
+.rule-item{background:var(--bg);padding:16px 20px;display:flex;gap:16px;align-items:flex-start}
+.rule-num{font-family:var(--mono);font-size:10px;color:var(--grey2);min-width:20px;margin-top:2px}
+.rule-title{font-size:13px;font-weight:500;margin-bottom:3px;color:var(--white)}
+.rule-body{font-size:12px;color:var(--grey);line-height:1.6}
+.rule-stat{font-size:10px;color:var(--grey2);font-family:var(--mono);margin-top:5px}
+.rule-item.hard{border-left:2px solid var(--red)}
+.rule-item.soft{border-left:2px solid var(--yellow)}
+.rule-item.protect{border-left:2px solid var(--green)}
+
+/* ── CHECKLIST ── */
+.check-item{display:flex;gap:12px;padding:12px 0;border-bottom:1px solid var(--line);align-items:flex-start}
+.check-item:last-child{border-bottom:none}
+.cbox{width:16px;height:16px;border:1px solid var(--grey2);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;margin-top:2px;transition:all .1s}
+.cbox.checked{background:var(--white);border-color:var(--white);color:var(--black)}
+.check-text{font-size:12.5px;color:var(--grey)}
+.check-sub{font-size:10px;color:var(--grey2);margin-top:2px;font-family:var(--mono)}
+
+/* ── ARCH DIAGRAM ── */
+.arch-flow{display:flex;flex-direction:column;align-items:center;gap:0;padding:24px}
+.arch-node{border:1px solid var(--line2);padding:10px 24px;font-size:12px;font-weight:600;font-family:var(--grotesk);text-align:center;min-width:160px;background:var(--bg2)}
+.arch-node.accent{border-color:var(--white);color:var(--white)}
+.arch-node.gold{border-color:var(--yellow);color:var(--yellow)}
+.arch-node.grn{border-color:var(--green);color:var(--green)}
+.arch-node.cyn{border-color:var(--cyan);color:var(--cyan)}
+.arch-arrow{font-size:16px;color:var(--grey2);line-height:1;padding:4px}
+.arch-split{display:flex;gap:24px;align-items:flex-start}
+.arch-branch{display:flex;flex-direction:column;align-items:center;gap:0}
+.arch-connector{width:1px;height:20px;background:var(--line2)}
+
+/* ── COUNTER ANIMATION ── */
+.counter{display:inline-block}
+
+/* ── EQUITY TOOLTIP ── */
+.eq-legend{display:flex;gap:20px;font-size:10px;font-family:var(--mono);color:var(--grey)}
+.eq-dot{width:8px;height:2px;display:inline-block;margin-right:5px;vertical-align:middle}
+
+@media(max-width:900px){
+  .stat-grid{grid-template-columns:1fr 1fr}.stat-cell{border-bottom:1px solid var(--line)}
+  .g2,.g3{grid-template-columns:1fr}.circle-row{grid-template-columns:repeat(3,1fr)}
+  .nav-links{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav>
+  <div class="nav-logo">OMEIZA.ETH</div>
+  <div class="nav-links">
+    <button class="nav-link active" onclick="showPage('overview',this)">Overview</button>
+    <button class="nav-link" onclick="showPage('performance',this)">Performance</button>
+    <button class="nav-link" onclick="showPage('edge',this)">Edge</button>
+    <button class="nav-link" onclick="showPage('execution',this)">Execution</button>
+    <button class="nav-link" onclick="showPage('circles',this)">Circles</button>
+    <button class="nav-link" onclick="showPage('montecarlo',this)">Lab</button>
+    <button class="nav-link" onclick="showPage('rules',this)">Protocol</button>
+  </div>
+  <div class="nav-right">
+    <span class="nav-tag">ALGO5THM / A5RT</span>
+    <span class="nav-tag">ABUJA · NG</span>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════ OVERVIEW -->
+<div id="page-overview" class="page active">
+
+  <div class="hero-strip">
+    <div class="hero-eyebrow">VERIFIED PERFORMANCE · A5RT TRADING SYSTEM</div>
+    <div class="hero-title">Results speak<br><em>louder than words.</em></div>
+    <div class="hero-sub">Real metrics. Verified data. Consistent process. Performance evaluated in R-multiples — the only currency that scales.</div>
+    <div class="hero-philosophy">
+      <span class="phil-arrow">PROTECT</span>
+      <span class="phil-div">→</span>
+      <span class="phil-arrow">QUALIFY</span>
+      <span class="phil-div">→</span>
+      <span class="phil-arrow">EXECUTE</span>
+      <span style="margin-left:24px;font-size:11px;color:var(--grey)">Discipline. Process. Compounding.</span>
+    </div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-cell">
+      <div class="stat-val pos counter" data-val="44.3" data-suffix="R" data-prefix="+">+44.3R</div>
+      <div class="stat-label">Cumulative R</div>
+      <div class="stat-sub" style="color:var(--grey2)">All journal periods</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-val pos counter" data-val="1.15" data-suffix="R" data-prefix="+">+1.15R</div>
+      <div class="stat-label">A+/Clean Expectancy</div>
+      <div class="stat-sub pos">Qualified trades only</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-val wht counter" data-val="104" data-suffix="">104</div>
+      <div class="stat-label">Total Trades</div>
+      <div class="stat-sub" style="color:var(--grey2)">Circles 0 – 5</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-val neu counter" data-val="26.3" data-suffix="%">26.3%</div>
+      <div class="stat-label">Win Rate (A+/Clean)</div>
+      <div class="stat-sub" style="color:var(--grey2)">High R:R system</div>
+    </div>
+  </div>
+
+  <div class="chart-wrap">
+    <div class="chart-header">
+      <span class="chart-title">EQUITY CURVE — CUMULATIVE R · ALL PERIODS</span>
+      <div class="eq-legend">
+        <span><span class="eq-dot" style="background:var(--white)"></span>Actual R</span>
+        <span><span class="eq-dot" style="background:var(--grey2);"></span>Zero</span>
+      </div>
+    </div>
+    <div class="chart-body">
+      <canvas id="mainEquity" height="180"></canvas>
+    </div>
+  </div>
+
+  <div class="g2" style="margin-top:1px">
+    <div class="gcell">
+      <div class="gcell-title">GRADE PERFORMANCE</div>
+      <table class="tbl">
+        <tr><th>Grade</th><th>n</th><th>Won</th><th>Total R</th><th>Exp.</th></tr>
+        <tr><td><span class="tag tg">A+/CLEAN</span></td><td>42</td><td class="pos">10</td><td class="pos">+43.9R</td><td class="pos">+1.15R</td></tr>
+        <tr><td><span class="tag tmid">CLEAN (C0–1)</span></td><td>9</td><td class="neu">2</td><td class="pos">+1.4R</td><td class="pos">+0.17R</td></tr>
+        <tr><td><span class="tag ty">A+/EX-ERROR</span></td><td>5</td><td class="neg">0</td><td class="neg">−5.1R</td><td class="neg">0%</td></tr>
+        <tr><td><span class="tag tr">NO SETUP/X</span></td><td>8</td><td class="neg">0</td><td class="neg">−5.3R</td><td class="neg">0%</td></tr>
+      </table>
+    </div>
+    <div class="gcell">
+      <div class="gcell-title">SESSION PERFORMANCE</div>
+      <table class="tbl">
+        <tr><th>Session</th><th>Trades</th><th>WR</th><th>Total R</th><th>Exp.</th></tr>
+        <tr><td>Overlap</td><td>3</td><td class="pos">67%</td><td class="pos">+12.7R</td><td class="pos">+4.25R</td></tr>
+        <tr><td>Asia</td><td>7</td><td class="pos">57%</td><td class="pos">+14.8R</td><td class="pos">+2.11R</td></tr>
+        <tr><td>New York</td><td>25</td><td class="neu">17%</td><td class="pos">+15.7R</td><td class="pos">+0.65R</td></tr>
+        <tr><td>London</td><td>56</td><td class="neg">17%</td><td class="pos">+1.1R</td><td class="pos">+0.02R</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div style="background:var(--line);height:1px;margin:0 0 1px"></div>
+
+  <div class="g3" style="margin-top:0">
+    <div class="gcell">
+      <div class="gcell-title">FRAMEWORK</div>
+      <div style="font-family:var(--grotesk);font-size:22px;font-weight:700;margin-bottom:8px">ALGO5THM / A5RT</div>
+      <div style="font-size:12px;color:var(--grey);line-height:1.7">Structure. Logic. Execution.<br><br>A structured trading model identifying high-probability opportunities by aligning higher-timeframe context with liquidity, market structure, and precise execution.</div>
+    </div>
+    <div class="gcell">
+      <div class="gcell-title">INSTRUMENTS</div>
+      <table class="tbl">
+        <tr><th>Pair</th><th>Type</th><th>Status</th></tr>
+        <tr><td><strong>EURUSD</strong></td><td>Forex</td><td><span class="tag tg">PRIMARY</span></td></tr>
+        <tr><td><strong>ETHUSD</strong></td><td>Crypto</td><td><span class="tag tg">PRIMARY</span></td></tr>
+        <tr><td><strong>GBPUSD</strong></td><td>Forex</td><td><span class="tag tc">SECONDARY</span></td></tr>
+        <tr><td><strong>BTCUSD</strong></td><td>Crypto</td><td><span class="tag tr">SUSPENDED</span></td></tr>
+      </table>
+    </div>
+    <div class="gcell">
+      <div class="gcell-title">CURRENT OBJECTIVE</div>
+      <div style="font-size:12px;color:var(--grey);line-height:1.8">
+        <div style="color:var(--white);font-weight:500;margin-bottom:6px">Prop Firm → Hedge Fund</div>
+        Grow A+/CLEAN sample to 100+ trades<br>
+        Sustain C5-level clean rate (74%)<br>
+        6-month funded account track record<br>
+        Calmar ratio target: ≥1.0 ✓ (<span class="pos">1.19 current</span>)
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════ PERFORMANCE -->
+<div id="page-performance" class="page">
+
+  <div class="sh"><span class="sh-title">Performance</span><span class="sh-meta">104 executed trades · R-multiple basis</span></div>
+
+  <div class="stat-grid">
+    <div class="stat-cell"><div class="stat-val pos">+5.9R</div><div class="stat-label">Avg Win (A+/Clean)</div></div>
+    <div class="stat-cell"><div class="stat-val neg">−0.54R</div><div class="stat-label">Avg Loss (A+/Clean)</div></div>
+    <div class="stat-cell"><div class="stat-val neu">9.7R</div><div class="stat-label">Median Max Drawdown</div><div class="stat-sub" style="color:var(--grey2)">Monte Carlo</div></div>
+    <div class="stat-cell"><div class="stat-val pos">+1.33R</div><div class="stat-label">C5 Expectancy</div><div class="stat-sub pos">Most recent period</div></div>
+  </div>
+
+  <div class="chart-wrap" style="margin-bottom:24px">
+    <div class="chart-header">
+      <span class="chart-title">CUMULATIVE R — ALL JOURNAL PERIODS</span>
+      <span style="font-size:10px;font-family:var(--mono);color:var(--grey2)">62 data points</span>
+    </div>
+    <div class="chart-body"><canvas id="perfEquity" height="200"></canvas></div>
+  </div>
+
+  <div class="sh"><span class="sh-title">Circle Summary</span><span class="sh-meta">Journal periods C0 – C5</span></div>
+
+  <table class="tbl" style="margin-bottom:32px">
+    <tr><th>Period</th><th>Trades</th><th>Won</th><th>Loss</th><th>BE</th><th>Win Rate</th><th>Total R</th><th>Avg Win</th><th>Expectancy</th><th>Max DD</th></tr>
+    <tr><td style="font-family:var(--mono)">C0</td><td>10</td><td class="pos">3</td><td class="neg">7</td><td>0</td><td class="neu">30%</td><td class="pos">+7.08R</td><td class="pos">+4.69R</td><td class="pos">+0.71R</td><td class="neg">6.0R</td></tr>
+    <tr><td style="font-family:var(--mono)">C1</td><td>14</td><td class="pos">3</td><td class="neg">11</td><td>0</td><td class="neu">21%</td><td class="pos">+4.75R</td><td class="pos">+4.88R</td><td class="pos">+0.34R</td><td class="neg">5.4R</td></tr>
+    <tr><td style="font-family:var(--mono)">C2</td><td>12</td><td class="pos">3</td><td class="neg">8</td><td>1</td><td class="neu">27%</td><td class="neg">−1.05R</td><td class="pos">+2.07R</td><td class="neg">−0.10R</td><td class="neg">5.3R</td></tr>
+    <tr><td style="font-family:var(--mono)">C3</td><td>14</td><td class="pos">1</td><td class="neg">11</td><td>2</td><td class="neg">8%</td><td class="neg">−2.91R</td><td class="pos">+0.69R</td><td class="neg">−0.25R</td><td class="neg">3.6R</td></tr>
+    <tr><td style="font-family:var(--mono)">C4</td><td>11</td><td class="pos">1</td><td class="neg">10</td><td>0</td><td class="neg">9%</td><td class="neg">−3.44R</td><td class="pos">+10.4R</td><td class="neg">−0.31R</td><td class="neg">13.8R</td></tr>
+    <tr style="background:rgba(74,222,128,.03)"><td style="font-family:var(--mono);color:var(--green)">C5</td><td>34</td><td class="pos">8</td><td class="neg">22</td><td>4</td><td class="neu">27%</td><td class="pos">+39.86R</td><td class="pos">+5.98R</td><td class="pos">+1.33R</td><td class="neg">5.0R</td></tr>
+  </table>
+
+  <div class="g2">
+    <div class="gcell">
+      <div class="gcell-title">INSTRUMENT PERFORMANCE</div>
+      <canvas id="pairChart" height="200"></canvas>
+    </div>
+    <div class="gcell">
+      <div class="gcell-title">ENTRY TYPE PERFORMANCE — TOTAL R</div>
+      <canvas id="entryChart" height="200"></canvas>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════ EDGE -->
+<div id="page-edge" class="page">
+
+  <div class="sh"><span class="sh-title">Edge Analysis</span><span class="sh-meta">Strategy vs execution vs behavioral cost</span></div>
+
+  <div class="insight">
+    <div class="insight-label">CORE FINDING</div>
+    <div class="insight-text">The <strong>A5RT edge is real and positive</strong> at +1.15R expectancy across 42 A+/CLEAN trades. Execution errors and behavioral trades have cost <strong>−10.34R</strong> that should not exist. Eliminating those 13 trades would bring total R to ~+54R.</div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-cell"><div class="stat-val pos">+1.15R</div><div class="stat-label">A+/Clean Expectancy</div><div class="stat-sub pos">Core edge signal</div></div>
+    <div class="stat-cell"><div class="stat-val neg">−10.3R</div><div class="stat-label">Execution Error Cost</div><div class="stat-sub neg">13 trades · 0 winners</div></div>
+    <div class="stat-cell"><div class="stat-val neg">0%</div><div class="stat-label">Error Win Rate</div><div class="stat-sub neg">Both EX-ERROR + NO SETUP</div></div>
+    <div class="stat-cell"><div class="stat-val pos">+54R</div><div class="stat-label">Error-Free Potential</div><div class="stat-sub pos">44.3 + 10.3 recovered</div></div>
+  </div>
+
+  <div class="g2">
+    <div class="gcell">
+      <div class="gcell-title">GRADE BREAKDOWN — SETUP · EXECUTION · OUTCOME</div>
+      <canvas id="gradeBar" height="220"></canvas>
+    </div>
+    <div class="gcell">
+      <div class="gcell-title">BIAS MODEL EXPECTANCY</div>
+      <table class="tbl">
+        <tr><th>Bias Model</th><th>n</th><th>WR</th><th>Total R</th><th>Exp.</th><th></th></tr>
+        <tr><td>H4 A+</td><td>19</td><td class="neu">21%</td><td class="pos">+16.2R</td><td class="pos">+0.85R</td><td><span class="tag tg">EDGE</span></td></tr>
+        <tr><td>H4 A+, R.ENTRY</td><td>12</td><td class="neu">27%</td><td class="pos">+6.2R</td><td class="pos">+0.56R</td><td><span class="tag tg">EDGE</span></td></tr>
+        <tr><td>ARC</td><td>7</td><td class="neg">17%</td><td class="pos">+5.7R</td><td class="pos">+0.95R</td><td><span class="tag tc">WATCH</span></td></tr>
+        <tr><td>R.ENTRY</td><td>8</td><td class="neu">29%</td><td class="pos">+1.0R</td><td class="pos">+0.13R</td><td><span class="tag tc">WATCH</span></td></tr>
+        <tr><td>H4A+ R.ENTRY</td><td>6</td><td class="neg">0%</td><td class="neg">−3.0R</td><td class="neg">N/A</td><td><span class="tag tr">REVIEW</span></td></tr>
+        <tr><td>ARC R.ENTRY</td><td>5</td><td class="neg">0%</td><td class="neg">−6.1R</td><td class="neg">N/A</td><td><span class="tag tr">STOP</span></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="sh" style="margin-top:24px"><span class="sh-title">C5 Deep Dive</span><span class="sh-meta">Genuine shift or ETH run?</span></div>
+
+  <div class="g3">
+    <div class="gcell">
+      <div class="gcell-title">ETH A+/CLEAN (C5)</div>
+      <div class="stat-val pos" style="font-size:22px;margin-bottom:4px">+35.9R</div>
+      <div style="font-size:11px;color:var(--grey);margin-bottom:12px;font-family:var(--mono)">14 trades · 53.8% WR · +2.94R exp</div>
+      <div class="tag tg">PRIMARY EDGE INSTRUMENT</div>
+    </div>
+    <div class="gcell">
+      <div class="gcell-title">LDN A+/CLEAN (C5 ONLY)</div>
+      <div class="stat-val pos" style="font-size:22px;margin-bottom:4px">+1.20R</div>
+      <div style="font-size:11px;color:var(--grey);margin-bottom:8px;font-family:var(--mono)">exp · vs +0.02R all-circles LDN</div>
+      <div style="font-size:11px;color:var(--grey);line-height:1.6">LDN has edge when execution is clean. The session is not the problem.</div>
+    </div>
+    <div class="gcell">
+      <div class="gcell-title">CLEAN RATE TREND</div>
+      <table class="tbl" style="font-size:11px">
+        <tr><th>Period</th><th>Clean%</th><th>Errors</th></tr>
+        <tr><td style="font-family:var(--mono)">C2</td><td class="neu">75%</td><td class="neg">25%</td></tr>
+        <tr><td style="font-family:var(--mono)">C3</td><td class="neg">57%</td><td class="neg">43%</td></tr>
+        <tr><td style="font-family:var(--mono)">C4</td><td class="neg">18%</td><td class="neg">82%</td></tr>
+        <tr><td style="font-family:var(--mono);color:var(--green)">C5</td><td class="pos">74%</td><td class="neu">24%</td></tr>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════ EXECUTION -->
+<div id="page-execution" class="page">
+
+  <div class="sh"><span class="sh-title">Execution Quality</span><span class="sh-meta">Where R is created and destroyed</span></div>
+
+  <div class="warn">
+    <div class="warn-label">CRITICAL — ARC RE-ENTRY</div>
+    <div class="warn-text">ARC R.ENTRY: <strong style="color:var(--red)">0 wins / 5 trades / −6.12R</strong>. Every single re-entry on a failed ARC setup has lost. ARC is session-scoped — once the first entry is consumed, the context is used. No re-entries until the next session's ARC forms.</div>
+  </div>
+
+  <div class="g2">
+    <div class="gcell">
+      <div class="gcell-title">ENTRY TYPE DETAIL — RANKED BY EXPECTANCY</div>
+      <table class="tbl">
+        <tr><th>Entry</th><th>n</th><th>WR</th><th>Total R</th><th>Exp.</th></tr>
+        <tr><td>BE/T.BAR</td><td>2</td><td class="pos">100%*</td><td class="pos">+14.5R</td><td class="pos">+7.25R*</td></tr>
+        <tr><td>BE/U.WICK</td><td>26</td><td class="neu">29%</td><td class="pos">+20.9R</td><td class="pos">+0.87R</td></tr>
+        <tr><td>M15 BE</td><td>13</td><td class="neu">31%</td><td class="pos">+9.3R</td><td class="pos">+0.71R</td></tr>
+        <tr><td>M3 SIM</td><td>8</td><td class="neu">25%</td><td class="pos">+4.6R</td><td class="pos">+0.57R</td></tr>
+        <tr><td>BE/IMB</td><td>18</td><td class="neg">13%</td><td class="pos">+2.4R</td><td class="pos">+0.15R</td></tr>
+        <tr><td>H4 BE</td><td>3</td><td class="neg">0%</td><td class="neg">−2.0R</td><td class="neg">N/A</td></tr>
+        <tr><td style="color:var(--red)">SIM/IMB</td><td>18</td><td class="neg">12%</td><td class="neg">−5.4R</td><td class="neg">−0.32R</td></tr>
+      </table>
+      <div style="font-size:10px;color:var(--grey2);font-family:var(--mono);margin-top:8px">* 2-trade sample — insufficient for full confidence</div>
+    </div>
+    <div class="gcell">
+      <div class="gcell-title">RE-ENTRY ANALYSIS</div>
+      <table class="tbl" style="margin-bottom:16px">
+        <tr><th>Type</th><th>n</th><th>WR</th><th>Total R</th><th>Rule</th></tr>
+        <tr><td>H4 A+ (first)</td><td>19</td><td class="neu">21%</td><td class="pos">+16.2R</td><td><span class="tag tg">KEEP</span></td></tr>
+        <tr><td>H4 A+, R.ENTRY</td><td>12</td><td class="neu">27%</td><td class="pos">+6.2R</td><td><span class="tag tc">SELECTIVE</span></td></tr>
+        <tr><td>H4A+ R.ENTRY</td><td>6</td><td class="neg">0%</td><td class="neg">−3.0R</td><td><span class="tag ty">INVESTIGATE</span></td></tr>
+        <tr><td>ARC (first)</td><td>7</td><td class="neg">17%</td><td class="pos">+5.7R</td><td><span class="tag tc">WATCH</span></td></tr>
+        <tr><td style="color:var(--red)">ARC R.ENTRY</td><td>5</td><td class="neg">0%</td><td class="neg">−6.1R</td><td><span class="tag tr">STOP</span></td></tr>
+      </table>
+      <div class="gcell-title" style="margin-top:16px">MISSED TRADES (9 total)</div>
+      <table class="tbl">
+        <tr><th>Period</th><th>Count</th><th>Notable</th></tr>
+        <tr><td style="font-family:var(--mono)">C1–C4</td><td>5</td><td style="color:var(--grey);font-size:11px">Includes deleted 1:20 order</td></tr>
+        <tr><td style="font-family:var(--mono)">C5</td><td>4</td><td style="color:var(--grey);font-size:11px">1:49.91R available, took 1:10R</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="sh" style="margin-top:24px"><span class="sh-title">Priority Action Matrix</span></div>
+
+  <table class="tbl">
+    <tr><th>Priority</th><th>Finding</th><th>R Impact</th><th>Action</th></tr>
+    <tr><td><span class="tag tr">P1 STOP</span></td><td>ARC R.ENTRY — 0/5 wins</td><td class="neg">−6.12R</td><td style="color:var(--grey);font-size:12px">Hard rule: no ARC re-entries after failed first entry</td></tr>
+    <tr><td><span class="tag tr">P1 STOP</span></td><td>NO SETUP/X trades</td><td class="neg">−5.28R</td><td style="color:var(--grey);font-size:12px">Zero tolerance for trades outside A5RT framework</td></tr>
+    <tr><td><span class="tag tr">P1 STOP</span></td><td>Deleting set limit orders</td><td class="neg">Unknown</td><td style="color:var(--grey);font-size:12px">Never delete a valid limit order once placed</td></tr>
+    <tr><td><span class="tag ty">P2 REVIEW</span></td><td>SIM/IMB — 12% WR, −5.4R</td><td class="neg">−5.38R</td><td style="color:var(--grey);font-size:12px">Only in strongest confluence setups</td></tr>
+    <tr><td><span class="tag ty">P2 REDUCE</span></td><td>LDN overtrade: 54% of trades, 2.5% of R</td><td class="neu">Opportunity cost</td><td style="color:var(--grey);font-size:12px">LDN: A+ setups only, no filter compromise</td></tr>
+    <tr><td><span class="tag tc">P3 BUILD</span></td><td>BE/T.BAR — 2/2 wins, +7.25R avg</td><td class="pos">+7.25R avg</td><td style="color:var(--grey);font-size:12px">Track actively as sample grows</td></tr>
+    <tr><td><span class="tag tg">P4 PROTECT</span></td><td>ASIA session — 57% WR, +2.11R exp</td><td class="pos">Best session</td><td style="color:var(--grey);font-size:12px">Protect quality; don't overtrade</td></tr>
+  </table>
+
+</div>
+
+<!-- ══════════════════════════════════════ CIRCLES -->
+<div id="page-circles" class="page">
+
+  <div class="sh"><span class="sh-title">Circle Analysis</span><span class="sh-meta">Select a journal period</span></div>
+
+  <div class="circle-row" id="circleRow">
+    <div class="cchip active" onclick="selectCircle('C0',this)"><div class="cchip-id">CIRCLE 0</div><div class="cchip-r pos">+7.08R</div><div class="cchip-meta">30% WR · 10 trades</div></div>
+    <div class="cchip" onclick="selectCircle('C1',this)"><div class="cchip-id">CIRCLE 1</div><div class="cchip-r pos">+4.75R</div><div class="cchip-meta">21% WR · 14 trades</div></div>
+    <div class="cchip" onclick="selectCircle('C2',this)"><div class="cchip-id">CIRCLE 2</div><div class="cchip-r neg">−1.05R</div><div class="cchip-meta">27% WR · 12 trades</div></div>
+    <div class="cchip" onclick="selectCircle('C3',this)"><div class="cchip-id">CIRCLE 3</div><div class="cchip-r neg">−2.91R</div><div class="cchip-meta">8% WR · 14 trades</div></div>
+    <div class="cchip" onclick="selectCircle('C4',this)"><div class="cchip-id">CIRCLE 4</div><div class="cchip-r neg">−3.44R</div><div class="cchip-meta">9% WR · 11 trades</div></div>
+    <div class="cchip" onclick="selectCircle('C5',this)"><div class="cchip-id">CIRCLE 5</div><div class="cchip-r pos">+39.86R</div><div class="cchip-meta">27% WR · 34 trades</div></div>
+  </div>
+
+  <div id="circleDetail"></div>
+
+</div>
+
+<!-- ══════════════════════════════════════ MONTE CARLO (LAB) -->
+<div id="page-montecarlo" class="page">
+
+  <div class="sh"><span class="sh-title">Lab — Monte Carlo</span><span class="sh-meta">10,000 simulations · 500 trades · A+/CLEAN parameters</span></div>
+
+  <div class="insight">
+    <div class="insight-label">SIMULATION BASIS</div>
+    <div class="insight-text">Parameters from actual A+/CLEAN history: <strong>26.3% WR · +5.9R avg win · −0.54R avg loss · +1.15R expectancy</strong>. All 10,000 simulations end profitable over a 500-trade horizon.</div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-cell"><div class="stat-val pos">100%</div><div class="stat-label">Simulations Profitable</div><div class="stat-sub pos">10,000 / 10,000</div></div>
+    <div class="stat-cell"><div class="stat-val pos">+578R</div><div class="stat-label">Median Final R</div><div class="stat-sub" style="color:var(--grey2)">500-trade horizon</div></div>
+    <div class="stat-cell"><div class="stat-val neg">0.29%</div><div class="stat-label">Ruin Probability</div><div class="stat-sub neg">DD > 20R at 0.5% risk</div></div>
+    <div class="stat-cell"><div class="stat-val neu">17</div><div class="stat-label">Median Max Consec. L</div><div class="stat-sub neu">Statistically normal</div></div>
+  </div>
+
+  <div class="chart-wrap" style="margin-bottom:24px">
+    <div class="chart-header">
+      <span class="chart-title">EQUITY CONE — PERCENTILE BANDS · 500 TRADES</span>
+      <div class="eq-legend">
+        <span><span class="eq-dot" style="background:var(--white)"></span>Median</span>
+        <span><span class="eq-dot" style="background:rgba(74,222,128,.4)"></span>P25–P75</span>
+        <span><span class="eq-dot" style="background:rgba(74,222,128,.15)"></span>P10–P90</span>
+      </div>
+    </div>
+    <div class="chart-body"><canvas id="coneChart" height="220"></canvas></div>
+  </div>
+
+  <div class="g2">
+    <div class="gcell">
+      <div class="gcell-title">FINAL R — OUTCOME PERCENTILES</div>
+      <div style="margin-top:4px">
+        <div class="pbar-row"><div class="pbar-label">P5 (worst 5%)</div><div class="pbar-bg"><div class="pbar-fill" style="width:66%;background:var(--red)"></div></div><div class="pbar-val neg">+462R</div></div>
+        <div class="pbar-row"><div class="pbar-label">P25</div><div class="pbar-bg"><div class="pbar-fill" style="width:76%;background:var(--grey2)"></div></div><div class="pbar-val wht">+531R</div></div>
+        <div class="pbar-row"><div class="pbar-label">P50 Median</div><div class="pbar-bg"><div class="pbar-fill" style="width:83%;background:var(--white)"></div></div><div class="pbar-val wht">+578R</div></div>
+        <div class="pbar-row"><div class="pbar-label">P75</div><div class="pbar-bg"><div class="pbar-fill" style="width:90%;background:var(--green)"></div></div><div class="pbar-val pos">+627R</div></div>
+        <div class="pbar-row"><div class="pbar-label">P95 (best 5%)</div><div class="pbar-bg"><div class="pbar-fill" style="width:100%;background:var(--green)"></div></div><div class="pbar-val pos">+700R</div></div>
+      </div>
+      <div style="font-size:10px;color:var(--grey2);font-family:var(--mono);margin-top:12px">Even the worst 5% of simulations end at +462R. The floor is positive.</div>
+    </div>
+    <div class="gcell">
+      <div class="gcell-title">CONSECUTIVE LOSS EXPECTATION</div>
+      <div style="font-size:12px;color:var(--grey);line-height:1.7;margin-bottom:16px">In a 500-trade run, you <strong style="color:var(--white)">will face a streak of 17+ consecutive losses</strong>. This is statistically normal for a 26% win-rate system — not a sign the edge is broken.</div>
+      <table class="tbl">
+        <tr><th>Percentile</th><th>Max Loss Streak</th><th>Interpretation</th></tr>
+        <tr><td>P50</td><td class="neu">17</td><td style="color:var(--grey);font-size:11px">Expected in every run</td></tr>
+        <tr><td>P75</td><td class="neu">19</td><td style="color:var(--grey);font-size:11px">Common occurrence</td></tr>
+        <tr><td>P90</td><td class="neg">22</td><td style="color:var(--grey);font-size:11px">Rare but likely</td></tr>
+        <tr><td>P95</td><td class="neg">25</td><td style="color:var(--grey);font-size:11px">Extreme but normal</td></tr>
+        <tr><td>P99</td><td class="neg">30</td><td style="color:var(--grey);font-size:11px">Near-maximum scenario</td></tr>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════════ PROTOCOL -->
+<div id="page-rules" class="page">
+
+  <div class="sh"><span class="sh-title">Execution Protocol</span><span class="sh-meta">Data-derived rules · A5RT v1.0</span></div>
+
+  <div class="hero-philosophy" style="margin-bottom:32px;margin-top:0;padding-top:0;border-top:none;border-bottom:1px solid var(--line);padding-bottom:20px">
+    <span class="phil-arrow">PROTECT</span><span class="phil-div">→</span>
+    <span class="phil-arrow">QUALIFY</span><span class="phil-div">→</span>
+    <span class="phil-arrow">EXECUTE</span>
+    <span style="margin-left:auto;font-size:11px;color:var(--grey);font-family:var(--mono)">Every rule below has a data source.</span>
+  </div>
+
+  <div class="sh"><span class="sh-title">Hard Stop Rules</span><span class="sh-meta">Zero tolerance</span></div>
+
+  <div class="rule-list" style="margin-bottom:24px">
+    <div class="rule-item hard">
+      <div class="rule-num">01</div>
+      <div><div class="rule-title">No trades outside A5RT qualification</div><div class="rule-body">Setup must pass the full hierarchy before entry. Grade it A+ before entry — not after.</div><div class="rule-stat">SOURCE: 8 NO SETUP/X = −5.28R · 0% win rate · pure behavioral loss</div></div>
+    </div>
+    <div class="rule-item hard">
+      <div class="rule-num">02</div>
+      <div><div class="rule-title">No ARC re-entries after a failed first entry</div><div class="rule-body">ARC is session-scoped. A failed first entry consumes the context. No re-entry until the next session's ARC forms.</div><div class="rule-stat">SOURCE: ARC R.ENTRY = 0/5 wins · −6.12R · worst single re-entry pattern</div></div>
+    </div>
+    <div class="rule-item hard">
+      <div class="rule-num">03</div>
+      <div><div class="rule-title">Never delete a set limit order</div><div class="rule-body">Once placed on a valid A+ setup, the order stays until it triggers or the setup is structurally invalidated. Anxiety is not structural invalidation.</div><div class="rule-stat">SOURCE: Documented missed wins including 1:20R and 1:49.91R opportunities</div></div>
+    </div>
+    <div class="rule-item hard">
+      <div class="rule-num">04</div>
+      <div><div class="rule-title">Maximum 2 trades per day · Daily stop −2%</div><div class="rule-body">2 trades executed = session closed. −2% daily drawdown = session closed immediately. No exceptions.</div><div class="rule-stat">SOURCE: Defined risk model · C3/C4 spiral originated from session overtrading</div></div>
+    </div>
+  </div>
+
+  <div class="sh"><span class="sh-title">Entry & Exit Rules</span></div>
+
+  <div class="rule-list" style="margin-bottom:24px">
+    <div class="rule-item soft">
+      <div class="rule-num">05</div>
+      <div><div class="rule-title">Prioritise BE/U.WICK and BE/T.BAR entry structures</div><div class="rule-body">When multiple entry options exist within the same setup: BE/T.BAR → BE/U.WICK → M15 BE → BE/IMB → M3 SIM. Avoid SIM/IMB unless it is the only qualifying structure.</div><div class="rule-stat">SOURCE: BE/U.WICK +0.87R exp vs SIM/IMB −0.32R exp across comparable sample</div></div>
+    </div>
+    <div class="rule-item soft">
+      <div class="rule-num">06</div>
+      <div><div class="rule-title">Exit plan is set at entry, not during the trade</div><div class="rule-body">TP and SL are pre-defined before execution. Changes require structural invalidation only — not P&L anxiety or "locking in profits."</div><div class="rule-stat">SOURCE: C5 winner left 1.79R on table · EU trade had 1:49.91R available, took 1:10R</div></div>
+    </div>
+    <div class="rule-item soft">
+      <div class="rule-num">07</div>
+      <div><div class="rule-title">BTC suspended pending edge confirmation</div><div class="rule-body">0 wins across all circles including C5 A+/CLEAN (0/4). Suspended until 10+ A+/CLEAN trades show positive expectancy.</div><div class="rule-stat">SOURCE: BTC pair stats — zero edge demonstrated in any journal period</div></div>
+    </div>
+  </div>
+
+  <div class="sh"><span class="sh-title">Pre-Trade Checklist</span><span class="sh-meta" id="checkScore">0 / 10 checks</span></div>
+
+  <div id="checklist"></div>
+
+  <div style="display:flex;gap:12px;margin-top:16px">
+    <button onclick="resetChecklist()" style="padding:8px 18px;background:none;border:1px solid var(--line2);color:var(--grey);font-size:11px;font-family:var(--mono);cursor:pointer;letter-spacing:.05em">RESET</button>
+    <button onclick="checkAll()" style="padding:8px 18px;background:none;border:1px solid var(--line2);color:var(--grey);font-size:11px;font-family:var(--mono);cursor:pointer;letter-spacing:.05em">CHECK ALL</button>
+  </div>
+
+</div>
+
+<script>
+// ══ DATA
+const cumR=[-1,-2,-3,-4,-5,-6,0.68,-0.32,3.08,7.08,6.06,5.05,14.22,12.84,14.33,13.30,17.27,16.26,15.22,14.07,13.85,12.84,11.83,10.38,8.93,7.58,6.54,6.62,12.82,11.78,10.78,11.47,10.19,8.84,8.87,7.87,3.81,2.04,1.04,0.04,-0.96,-1.96,-2.96,-3.96,-4.96,-5.96,4.44,14.44,13.44,12.44,11.44,10.44,9.44,12.59,18.63,17.63,16.63,23.14,22.14,24.88,36.64,44.30];
+
+const cCone={p10:[-5,-10,-14,-17,-19,-21,-22,-23,-23,-23,-23,-22,-22,-21,-20,-19,-18,-16,-15,-13,-12,-10,-8,-6,-4,-2,0,2,5,7,10,13,15,18,21,24,28,31,35,39,43,47,51,56,60,65,70,75,80,85,90,96,102,108,114,120,127,133,140,147,155,162,170,177,185,193,202,210,218,227,236,245,254,263,273,282,292,302,312,322,333,343,354,365,376,387,399,410,422,434],p25:[8,1,-4,-7,-9,-10,-11,-10,-9,-8,-7,-6,-4,-2,0,2,4,7,9,12,15,17,20,23,26,30,33,36,40,44,47,51,55,59,63,67,72,76,81,85,90,95,100,105,110,116,121,127,132,138,144,150,156,162,168,175,181,188,195,202,209,216,224,231,239,246,254,262,270,278,287,295,304,312,321,330,339,349,358,368,377,387,397,407,417,427,437,448,458,469],p50:[22,16,10,7,4,2,1,1,2,3,5,7,9,12,14,16,19,22,25,28,31,34,37,40,44,47,51,54,58,62,65,69,73,77,81,86,90,94,99,103,108,113,118,122,127,132,138,143,148,154,159,165,171,176,182,188,194,200,206,213,219,226,232,239,246,252,259,266,273,281,288,295,303,310,318,326,334,342,350,358,367,375,384,392,401,410,419,428,438,447],p75:[35,29,24,21,19,18,17,18,19,20,21,23,25,28,30,33,36,39,43,46,50,53,57,60,64,68,72,76,80,84,88,93,97,102,107,111,116,121,126,131,137,142,147,153,158,164,170,176,181,187,193,200,206,212,218,225,231,238,244,251,258,265,272,279,287,294,301,309,316,324,332,339,347,355,363,372,380,388,397,405,414,423,432,441,450,459,468,478,487,497],p90:[49,44,39,36,34,33,32,33,34,35,37,39,41,44,47,50,53,56,60,63,67,71,74,78,83,87,91,95,100,104,109,114,118,123,128,133,138,143,148,154,159,165,170,176,181,187,193,199,205,211,218,224,230,237,243,250,256,263,270,277,284,291,298,306,313,320,328,336,343,351,359,367,375,383,392,400,409,417,426,435,443,452,461,470,479,489,498,507,517,526]};
+
+const cDef={color:'#f0f0f0',borderColor:'#222',plugins:{legend:{display:false},tooltip:{backgroundColor:'#111',titleColor:'#f0f0f0',bodyColor:'#888',borderColor:'#333',borderWidth:1,cornerRadius:0,titleFont:{family:"'Space Mono',monospace",size:10},bodyFont:{family:"'Space Mono',monospace",size:10}}}};
+const grdStyle={grid:{color:'rgba(34,34,34,.8)'},ticks:{color:'#555',font:{family:"'Space Mono',monospace",size:9}}};
+
+// ══ EQUITY CHARTS
+function makeEquityChart(id,h){
+  const labels=cumR.map((_,i)=>`T${i+1}`);
+  return new Chart(document.getElementById(id),{
+    type:'line',
+    data:{labels,datasets:[
+      {data:cumR,borderColor:'#f0f0f0',backgroundColor:'rgba(240,240,240,.04)',fill:true,tension:.35,pointRadius:0,pointHoverRadius:4,borderWidth:1.5},
+      {data:cumR.map(()=>0),borderColor:'rgba(85,85,85,.5)',borderDash:[2,4],pointRadius:0,borderWidth:1},
+    ]},
+    options:{...cDef,responsive:true,animation:{duration:1200,easing:'easeOutCubic'},scales:{x:{display:false},y:{...grdStyle,ticks:{...grdStyle.ticks,callback:v=>`${v>0?'+':''}${v}R`}}},plugins:{...cDef.plugins}}
+  });
+}
+makeEquityChart('mainEquity');
+makeEquityChart('perfEquity');
+
+// ══ CONE CHART
+const thinLabels=Array.from({length:90},(_,i)=>i===0?'T1':i===89?'T500':`T${Math.round(i*500/89)}`);
+new Chart(document.getElementById('coneChart'),{
+  type:'line',
+  data:{labels:thinLabels,datasets:[
+    {data:cCone.p90,borderColor:'rgba(74,222,128,0)',fill:'+1',backgroundColor:'rgba(74,222,128,.08)',tension:.4,pointRadius:0,borderWidth:0},
+    {data:cCone.p75,borderColor:'rgba(74,222,128,0)',fill:'+1',backgroundColor:'rgba(74,222,128,.12)',tension:.4,pointRadius:0,borderWidth:0},
+    {data:cCone.p50,borderColor:'rgba(240,240,240,.9)',fill:false,tension:.4,pointRadius:0,borderWidth:1.5,label:'Median'},
+    {data:cCone.p25,borderColor:'rgba(248,113,113,0)',fill:'+1',backgroundColor:'rgba(74,222,128,.12)',tension:.4,pointRadius:0,borderWidth:0},
+    {data:cCone.p10,borderColor:'rgba(248,113,113,0)',fill:'+1',backgroundColor:'rgba(248,113,113,.06)',tension:.4,pointRadius:0,borderWidth:0},
+  ]},
+  options:{...cDef,responsive:true,scales:{x:{display:false},y:{...grdStyle,ticks:{...grdStyle.ticks,callback:v=>`${v>0?'+':''}${v}R`}}}}
+});
+
+// ══ PAIR CHART
+new Chart(document.getElementById('pairChart'),{
+  type:'bar',
+  data:{
+    labels:['ETH','GBPUSD','EURUSD','EU','BTC','GU'],
+    datasets:[{data:[34.86,6.68,6.17,1.38,0,-3.77],backgroundColor:['rgba(74,222,128,.7)','rgba(74,222,128,.5)','rgba(74,222,128,.4)','rgba(240,240,240,.2)','rgba(85,85,85,.4)','rgba(248,113,113,.6)'],borderRadius:0}]
+  },
+  options:{...cDef,responsive:true,scales:{x:{...grdStyle},y:{...grdStyle,ticks:{...grdStyle.ticks,callback:v=>`${v}R`}}}}
+});
+
+// ══ ENTRY CHART
+new Chart(document.getElementById('entryChart'),{
+  type:'bar',
+  data:{
+    labels:['BE/T.BAR','BE/U.WICK','M15 BE','M3 SIM','BE/IMB','H4 BE','SIM/IMB'],
+    datasets:[{data:[14.5,20.9,9.3,4.6,2.4,-2.0,-5.4],backgroundColor:(v)=>v>=0?'rgba(240,240,240,.25)':'rgba(248,113,113,.5)',borderRadius:0}]
+  },
+  options:{...cDef,responsive:true,indexAxis:'y',scales:{x:{...grdStyle,ticks:{...grdStyle.ticks,callback:v=>`${v}R`}},y:{...grdStyle,grid:{display:false}}}}
+});
+// fix colors
+document.getElementById('entryChart').data = {
+  labels:['BE/T.BAR','BE/U.WICK','M15 BE','M3 SIM','BE/IMB','H4 BE','SIM/IMB'],
+  datasets:[{data:[14.5,20.9,9.3,4.6,2.4,-2.0,-5.4],backgroundColor:[14.5,20.9,9.3,4.6,2.4,-2.0,-5.4].map(v=>v>=0?'rgba(240,240,240,.25)':'rgba(248,113,113,.5)'),borderRadius:0}]
+};
+
+// ══ GRADE BAR
+new Chart(document.getElementById('gradeBar'),{
+  type:'bar',
+  data:{
+    labels:['A+/CLEAN','A+/EX-ERROR','NO SETUP/X'],
+    datasets:[
+      {label:'Won',data:[10,0,0],backgroundColor:'rgba(74,222,128,.7)',borderRadius:0},
+      {label:'Loss',data:[28,5,6],backgroundColor:'rgba(248,113,113,.6)',borderRadius:0},
+      {label:'BE',data:[4,0,2],backgroundColor:'rgba(250,204,21,.4)',borderRadius:0},
+    ]
+  },
+  options:{...cDef,responsive:true,scales:{x:{stacked:true,...grdStyle},y:{stacked:true,...grdStyle}},plugins:{...cDef.plugins,legend:{display:true,position:'top',labels:{color:'#555',font:{size:10,family:"'Space Mono',monospace"},boxWidth:10}}}}
+});
+
+// ══ CIRCLES
+const circleData={
+  C0:{n:10,won:3,loss:7,be:0,missed:0,total_r:7.08,wr:.30,aw:4.69,al:-1.0,exp:0.71,mdd:6.0,note:"Early journal — no grade column. Positive expectancy anchored by large winners averaging +4.7R. Clean start with 30% WR."},
+  C1:{n:14,won:3,loss:11,be:0,missed:1,total_r:4.75,wr:.21,aw:4.88,al:-0.90,exp:0.34,mdd:5.4,note:"Still no grade data. Large winners (EURUSD +4.58R, NY +7.94R) salvage a low win rate. First MISSED trade logged."},
+  C2:{n:12,won:3,loss:8,be:1,missed:1,total_r:-1.05,wr:.27,aw:2.07,al:-0.92,exp:-0.10,mdd:5.3,note:"First circle with full grade data. FOMO patterns begin appearing in thought logs. Notable: a deleted limit order that became a 1:20R winner."},
+  C3:{n:14,won:1,loss:11,be:2,missed:2,total_r:-2.91,wr:.08,aw:0.69,al:-0.33,exp:-0.25,mdd:3.6,note:"Worst execution period — 8% WR (1 win from 14). Emotional re-entries dominate thought logs. Risk control held: max DD only 3.6R."},
+  C4:{n:11,won:1,loss:10,be:0,missed:1,total_r:-3.44,wr:.09,aw:10.4,al:-1.38,exp:-0.31,mdd:13.8,note:"Peak drawdown circle at 13.8R. One +10.4R win rescued from a spiral. 82% of trades were error-contaminated — the documented low point."},
+  C5:{n:34,won:8,loss:22,be:4,missed:4,total_r:39.86,wr:.27,aw:5.98,al:-0.36,exp:1.33,mdd:5.0,note:"Breakthrough period. ETH drives 87% of R. A+/CLEAN rate climbs to 74% (vs 18% in C4). First circle with institutional-grade expectancy at +1.33R."},
+};
+
+function selectCircle(c,el){
+  document.querySelectorAll('.cchip').forEach(x=>x.classList.remove('active'));
+  el.classList.add('active');
+  const d=circleData[c];
+  const rc=d.total_r>=0?'pos':'neg';
+  const ec=d.exp>=0?'pos':'neg';
+  document.getElementById('circleDetail').innerHTML=`
+    <div class="insight"><div class="insight-label">${c} · PERIOD NOTES</div><div class="insight-text">${d.note}</div></div>
+    <div class="stat-grid">
+      <div class="stat-cell"><div class="stat-val ${rc}">${d.total_r>=0?'+':''}${d.total_r}R</div><div class="stat-label">Total R</div></div>
+      <div class="stat-cell"><div class="stat-val neu">${(d.wr*100).toFixed(0)}%</div><div class="stat-label">Win Rate</div><div class="stat-sub" style="color:var(--grey2)">${d.won}W / ${d.loss}L / ${d.be}BE</div></div>
+      <div class="stat-cell"><div class="stat-val pos">${d.aw?'+'+d.aw:'N/A'}R</div><div class="stat-label">Avg Win</div></div>
+      <div class="stat-cell"><div class="stat-val neg">${d.al}R</div><div class="stat-label">Avg Loss</div></div>
+    </div>
+    <div class="g2"><div class="gcell"><table class="tbl"><tr><th>Metric</th><th>Value</th></tr>
+      <tr><td>Expectancy</td><td class="${ec}">${d.exp>=0?'+':''}${d.exp}R</td></tr>
+      <tr><td>Max Drawdown</td><td class="neg">${d.mdd}R</td></tr>
+      <tr><td>Trades Executed</td><td>${d.n}</td></tr>
+      <tr><td>Missed Opportunities</td><td class="neu">${d.missed}</td></tr>
+    </table></div>
+    <div class="gcell" id="miniEquity_${c}"><div class="gcell-title">MINI EQUITY — ${c}</div><canvas id="mini_${c}" height="120"></canvas></div>
+    </div>`;
+  // mini equity per circle
+  const bounds={C0:[0,10],C1:[10,24],C2:[24,36],C3:[36,50],C4:[50,61],C5:[61,62]};
+  const b=bounds[c]; const slice=cumR.slice(b[0],b[1]);
+  const base=b[0]>0?cumR[b[0]-1]:0;
+  const rel=slice.map(v=>+(v-base).toFixed(3));
+  setTimeout(()=>{
+    new Chart(document.getElementById(`mini_${c}`),{
+      type:'line',
+      data:{labels:rel.map((_,i)=>`T${i+1}`),datasets:[
+        {data:rel,borderColor:d.total_r>=0?'rgba(74,222,128,.8)':'rgba(248,113,113,.8)',backgroundColor:d.total_r>=0?'rgba(74,222,128,.04)':'rgba(248,113,113,.04)',fill:true,tension:.35,pointRadius:0,borderWidth:1.5},
+        {data:rel.map(()=>0),borderColor:'rgba(85,85,85,.5)',borderDash:[2,4],pointRadius:0,borderWidth:1},
+      ]},
+      options:{...cDef,responsive:true,scales:{x:{display:false},y:{...grdStyle,ticks:{...grdStyle.ticks,callback:v=>`${v>0?'+':''}${v}R`}}}}
+    });
+  },50);
+}
+selectCircle('C0',document.querySelector('.cchip'));
+
+// ══ CHECKLIST
+const checks=[
+  {t:'Setup qualifies as A+ under A5RT framework',s:'Setup → Bias → Liquidity → Model → Entry hierarchy passed'},
+  {t:'Bias model is H4 A+, H4 B+, ARC, or defined variant',s:'Not a first-time or unnamed setup structure'},
+  {t:'Entry type is BE/U.WICK, BE/IMB, M15 BE, or M3 SIM',s:'SIM/IMB only if sole qualifying structure'},
+  {t:'This is NOT an ARC re-entry after a failed first entry',s:'ARC R.ENTRY hard stop — 0% win rate in journal'},
+  {t:'SL placement is at structure-based invalidation level',s:'Not compressed to reduce risk or fit a number'},
+  {t:'TP is pre-defined based on structure or planned R:R',s:'Exit plan set before entry, not adjusted mid-trade'},
+  {t:'BE stop trigger is pre-defined — not emotional',s:'Move to BE when price reaches X structural point'},
+  {t:'This is not trade number 3+ today',s:'Max 2 trades per session — hard rule'},
+  {t:'Daily drawdown has not reached −2%',s:'If −2% is hit, session is over regardless of setups'},
+  {t:'Grade is pre-assigned: this qualifies as A+',s:'If it cannot be graded A+ before entry, do not take it'},
+];
+const checkState=new Array(10).fill(false);
+function renderChecklist(){
+  const div=document.getElementById('checklist');
+  div.innerHTML=checks.map((c,i)=>`
+    <div class="check-item">
+      <div class="cbox${checkState[i]?' checked':''}" onclick="toggleCheck(${i})">${checkState[i]?'✓':''}</div>
+      <div><div class="check-text" style="${checkState[i]?'opacity:.4':''}">${c.t}</div><div class="check-sub">${c.s}</div></div>
+    </div>`).join('');
+  const done=checkState.filter(Boolean).length;
+  const sc=document.getElementById('checkScore');
+  sc.textContent=`${done} / 10 checks`;
+  sc.style.color=done===10?'var(--green)':done>=7?'var(--yellow)':'var(--grey2)';
+}
+function toggleCheck(i){checkState[i]=!checkState[i];renderChecklist()}
+function resetChecklist(){checkState.fill(false);renderChecklist()}
+function checkAll(){checkState.fill(true);renderChecklist()}
+renderChecklist();
+
+// ══ NAV
+function showPage(id,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  el.classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ══ COUNTER ANIMATION
+function animateCounters(){
+  document.querySelectorAll('.counter').forEach(el=>{
+    const val=parseFloat(el.dataset.val);
+    const pre=el.dataset.prefix||'';
+    const suf=el.dataset.suffix||'';
+    let start=0; const dur=1400; const step=16;
+    const inc=val/(dur/step);
+    const t=setInterval(()=>{
+      start=Math.min(start+inc,val);
+      el.textContent=pre+(Number.isInteger(val)?Math.round(start):start.toFixed(1))+suf;
+      if(start>=val)clearInterval(t);
+    },step);
+  });
+}
+setTimeout(animateCounters,300);
+</script>
+</body>
+</html>
